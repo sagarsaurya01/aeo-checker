@@ -4,65 +4,90 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your AEO score</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#1a1a2e; --muted:#5b5b7a; --bg:#f6f7fb; --card:#fff; --accent:#4f46e5; --line:#e6e6f0;
-          --good:#16a34a; --mid:#d97706; --bad:#dc2626; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
-  .wrap { max-width:720px; margin:0 auto; padding:40px 16px; }
-  a.back { color:var(--accent); text-decoration:none; font-weight:600; }
-  .score-card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; margin:18px 0; }
-  .score { font-size:3.6rem; font-weight:800; line-height:1; }
-  .grade { font-size:1.1rem; font-weight:700; margin-top:6px; }
-  .url { color:var(--muted); word-break:break-all; margin-top:8px; font-size:.9rem; }
-  .bucket { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:12px 0; }
-  .bhead { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-  .bname { font-weight:700; }
-  .bpts { font-weight:800; white-space:nowrap; }
-  .bar { height:8px; background:var(--line); border-radius:6px; margin:10px 0; overflow:hidden; }
-  .bar > span { display:block; height:100%; border-radius:6px; }
-  ul { margin:8px 0 0; padding-left:18px; color:var(--muted); font-size:.92rem; }
-  .fix { margin-top:10px; background:#f3f1ff; border-left:3px solid var(--accent); padding:8px 12px; border-radius:6px; font-size:.92rem; }
-  .err { background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; color:var(--bad); }
-  .cta { background:var(--ink); color:#fff; border-radius:16px; padding:22px; margin-top:20px; text-align:center; }
-  .cta b { font-size:1.1rem; }
+  :root{
+    --ink:#0f1021; --muted:#6b6b86; --bg:#f4f5fb; --card:#ffffff; --line:#e7e7f1;
+    --accent:#5b4bff; --accent2:#9b5bff; --good:#16a34a; --mid:#e0820a; --bad:#e23b3b;
+    --shadow:0 20px 50px -24px rgba(40,30,120,.35);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:var(--bg);background-image:radial-gradient(1200px 500px at 50% -10%, #eae7ff 0%, rgba(244,245,251,0) 60%);}
+  .wrap{max-width:760px;margin:0 auto;padding:34px 18px 72px;}
+  a.back{color:var(--accent);text-decoration:none;font-weight:700;font-size:.92rem;}
+  .score-card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:30px 24px;
+    box-shadow:var(--shadow);text-align:center;margin:16px 0 26px;}
+  .hi{color:var(--muted);font-weight:600;margin-bottom:6px;}
+  .gauge{position:relative;width:200px;height:200px;margin:6px auto 4px;}
+  .gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge .num b{font-size:3.2rem;line-height:1;font-weight:800;letter-spacing:-.02em;}
+  .gauge .num span{color:var(--muted);font-weight:600;font-size:.9rem;}
+  .grade{font-size:1.25rem;font-weight:800;margin-top:6px;}
+  .url{color:var(--muted);word-break:break-all;margin-top:8px;font-size:.88rem;}
+  h3{margin:26px 4px 10px;font-size:1.15rem;}
+  .bucket{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:12px 0;box-shadow:0 10px 30px -22px rgba(40,30,120,.4);}
+  .bhead{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .bname{font-weight:700;display:flex;align-items:center;gap:9px;}
+  .pill{width:10px;height:10px;border-radius:50%;flex:0 0 auto;}
+  .bpts{font-weight:800;white-space:nowrap;font-size:.95rem;}
+  .bar{height:9px;background:#eeeef6;border-radius:6px;margin:12px 0 0;overflow:hidden;}
+  .bar>span{display:block;height:100%;border-radius:6px;}
+  ul{margin:12px 0 0;padding-left:18px;color:var(--muted);font-size:.9rem;line-height:1.5;}
+  .fix{margin-top:12px;background:#f1efff;border-left:3px solid var(--accent);padding:10px 13px;border-radius:8px;font-size:.9rem;}
+  .err{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;color:var(--bad);box-shadow:var(--shadow);margin-top:16px;}
+  .cta{background:linear-gradient(120deg,#17162e,#2a2250);color:#fff;border-radius:22px;padding:26px;margin-top:24px;text-align:center;box-shadow:var(--shadow);}
+  .cta b{font-size:1.2rem;}
+  .cta p{color:#cdc9ee;font-size:.9rem;margin:8px 0 0;line-height:1.5;}
+  .cta .price{display:inline-block;margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+    padding:8px 16px;border-radius:999px;font-weight:700;}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <a class="back" href="/">&larr; Check another site</a>
+    <a class="back" href="/">← Check another site</a>
 
     {% if not audit.ok %}
-      <div class="err" style="margin-top:18px;">
-        <b>We couldn't read that site.</b><br>{{ audit.error }}
-      </div>
+      <div class="err"><b>We couldn't read that site.</b><br>{{ audit.error }}</div>
     {% else %}
       {% set color = 'var(--good)' if audit.score >= 60 else ('var(--mid)' if audit.score >= 40 else 'var(--bad)') %}
+      {% set circ = 2 * 3.14159 * 86 %}
       <div class="score-card">
-        {% if name %}<div style="color:var(--muted);">Hi {{ name }}, here's your result</div>{% endif %}
-        <div class="score" style="color:{{ color }};">{{ audit.score }}<span style="font-size:1.4rem;color:var(--muted);">/100</span></div>
+        {% if name %}<div class="hi">Hi {{ name }}, here's your result</div>{% endif %}
+        <div class="gauge">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="86" fill="none" stroke="#eeeef6" stroke-width="16"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="{{ color }}" stroke-width="16"
+              stroke-linecap="round" transform="rotate(-90 100 100)"
+              stroke-dasharray="{{ circ }}" stroke-dashoffset="{{ circ * (1 - audit.score/100) }}"/>
+          </svg>
+          <div class="num"><b style="color:{{ color }};">{{ audit.score }}</b><span>out of 100</span></div>
+        </div>
         <div class="grade" style="color:{{ color }};">{{ audit.grade }}</div>
         <div class="url">{{ audit.url }}</div>
       </div>
 
-      <h3 style="margin:22px 0 6px;">Your results (biggest problems first)</h3>
+      <h3>Your results — biggest problems first</h3>
       {% for r in audit.results %}
         {% set c = 'var(--good)' if r.pct >= 70 else ('var(--mid)' if r.pct >= 40 else 'var(--bad)') %}
         <div class="bucket">
           <div class="bhead">
-            <span class="bname">{{ r.name }}</span>
+            <span class="bname"><span class="pill" style="background:{{ c }};"></span>{{ r.name }}</span>
             <span class="bpts" style="color:{{ c }};">{{ r.points }} / {{ r.max_points|int }}</span>
           </div>
-          <div class="bar"><span style="width:{{ r.pct }}%; background:{{ c }};"></span></div>
+          <div class="bar"><span style="width:{{ r.pct }}%;background:{{ c }};"></span></div>
           <ul>{% for f in r.findings %}<li>{{ f }}</li>{% endfor %}</ul>
-          {% if r.fix %}<div class="fix"><b>Fix:</b> {{ r.fix }}</div>{% endif %}
+          {% if r.fix %}<div class="fix"><b>How to fix:</b> {{ r.fix }}</div>{% endif %}
         </div>
       {% endfor %}
 
       <div class="cta">
-        <b>Want these fixed?</b><br>
-        We make your site AI-ready - usually ₹15,000 to ₹50,000 depending on size.<br>
-        <span style="color:#cfcfe6;font-size:.9rem;">We'll be in touch. This score measures readiness, not a guarantee of appearing in AI answers.</span>
+        <b>Want these fixed for you?</b>
+        <p>We make your site AI-ready so ChatGPT, Gemini and Perplexity can read and recommend it.</p>
+        <span class="price">₹15,000 – ₹50,000 depending on site size</span>
+        <p style="font-size:.8rem;opacity:.8;">This score measures readiness — not a guarantee of appearing in AI answers.</p>
       </div>
     {% endif %}
   </div>

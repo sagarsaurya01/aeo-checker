@@ -3,31 +3,68 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AEO Readiness Checker</title>
+<title>AEO Readiness Checker — Is your site ready for AI?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#1a1a2e; --muted:#5b5b7a; --bg:#f6f7fb; --card:#fff; --accent:#4f46e5; --line:#e6e6f0; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
-  .wrap { max-width:640px; margin:0 auto; padding:48px 16px; }
-  h1 { font-size:1.9rem; margin:0 0 8px; }
-  p.lead { color:var(--muted); margin:0 0 28px; font-size:1.05rem; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:24px; }
-  label { display:block; font-weight:600; margin:14px 0 6px; font-size:.95rem; }
-  input { width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px; font-size:1rem; }
-  button { margin-top:22px; width:100%; padding:14px; background:var(--accent); color:#fff; border:0; border-radius:10px; font-size:1.05rem; font-weight:700; cursor:pointer; }
-  .row { display:flex; gap:12px; }
-  .row > div { flex:1; }
-  .note { color:var(--muted); font-size:.85rem; margin-top:16px; text-align:center; }
+  :root{
+    --ink:#0f1021; --muted:#6b6b86; --bg:#f4f5fb; --card:#ffffff; --line:#e7e7f1;
+    --accent:#5b4bff; --accent2:#9b5bff; --good:#16a34a; --mid:#e0820a; --bad:#e23b3b;
+    --shadow:0 20px 50px -24px rgba(40,30,120,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    color:var(--ink); background:var(--bg);
+    background-image:radial-gradient(1200px 500px at 50% -10%, #eae7ff 0%, rgba(244,245,251,0) 60%);
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:56px 18px 72px;}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:7px 14px;font-size:.82rem;font-weight:600;color:var(--muted);box-shadow:var(--shadow);}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 4px rgba(22,163,74,.15);}
+  h1{font-size:2.5rem;line-height:1.08;margin:22px 0 14px;letter-spacing:-.02em;font-weight:800;}
+  h1 .grad{background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .lead{color:var(--muted);font-size:1.12rem;line-height:1.55;margin:0 0 20px;}
+  .engines{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px;}
+  .chip{font-size:.8rem;font-weight:600;color:#4a4a63;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:var(--shadow);}
+  form label{display:block;font-weight:700;margin:16px 0 7px;font-size:.9rem;}
+  .hint{font-weight:500;color:var(--muted);font-size:.8rem;}
+  input{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;font-family:inherit;
+    transition:border-color .15s, box-shadow .15s;background:#fcfcff;}
+  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(91,75,255,.14);}
+  .row{display:flex;gap:12px;}.row>div{flex:1;}
+  button{margin-top:22px;width:100%;padding:16px;border:0;border-radius:13px;cursor:pointer;
+    font-family:inherit;font-size:1.06rem;font-weight:800;color:#fff;letter-spacing:.01em;
+    background:linear-gradient(100deg,var(--accent),var(--accent2));
+    box-shadow:0 12px 26px -10px rgba(91,75,255,.7);transition:transform .08s, box-shadow .15s;}
+  button:hover{transform:translateY(-1px);box-shadow:0 16px 30px -10px rgba(91,75,255,.8);}
+  button:active{transform:translateY(0);}
+  .note{color:var(--muted);font-size:.84rem;margin-top:14px;text-align:center;}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px;}
+  .step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;}
+  .step .n{width:30px;height:30px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;
+    font-weight:800;color:#fff;background:linear-gradient(100deg,var(--accent),var(--accent2));font-size:.9rem;}
+  .step p{margin:0;font-size:.82rem;color:var(--muted);font-weight:500;line-height:1.4;}
+  @media(max-width:520px){h1{font-size:2rem;} .steps{grid-template-columns:1fr;} .row{flex-direction:column;}}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Is your website ready for AI?</h1>
-    <p class="lead">Get a free score out of 100 on how well ChatGPT, Gemini, Perplexity and Google AI can read your site.</p>
+    <span class="badge"><span class="dot"></span> Free AI-visibility audit</span>
+    <h1>Can AI find your business, or <span class="grad">does it skip you?</span></h1>
+    <p class="lead">Get a free score out of 100 on how easily ChatGPT, Gemini, Perplexity and Google AI can read, trust and recommend your website.</p>
+    <div class="engines">
+      <span class="chip">ChatGPT</span><span class="chip">Gemini</span>
+      <span class="chip">Perplexity</span><span class="chip">Google AI Overviews</span>
+    </div>
+
     <div class="card">
       <form method="post" action="/audit">
-        <label for="url">Your website address</label>
-        <input id="url" name="url" placeholder="example.com" required>
+        <label for="url">Your website <span class="hint">— we'll scan it in ~15 seconds</span></label>
+        <input id="url" name="url" placeholder="yourbusiness.com" required autofocus>
         <div class="row">
           <div>
             <label for="name">Name</label>
@@ -35,14 +72,20 @@
           </div>
           <div>
             <label for="phone">WhatsApp</label>
-            <input id="phone" name="phone" placeholder="Phone">
+            <input id="phone" name="phone" placeholder="Phone number">
           </div>
         </div>
-        <label for="email">Email</label>
+        <label for="email">Email <span class="hint">— where we send your full report</span></label>
         <input id="email" name="email" type="email" placeholder="you@business.com">
-        <button type="submit">Check my site - free</button>
+        <button type="submit">Check my AI readiness — free →</button>
       </form>
-      <p class="note">Takes about 15 seconds. No login needed.</p>
+      <p class="note">No login. No payment. Your full report lands in your inbox.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><p>Enter your website address</p></div>
+      <div class="step"><div class="n">2</div><p>We scan it the way AI bots do</p></div>
+      <div class="step"><div class="n">3</div><p>Get your score + how to fix it</p></div>
     </div>
   </div>
 </body>
