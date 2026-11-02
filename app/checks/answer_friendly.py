@@ -1,7 +1,13 @@
 """Bucket 4 - Answer-friendly content (20 points).
 
-AI tools quote pages that give clear, direct facts: question-style headings,
-FAQs, a phone number, a price, a city/address.
+AI tools quote pages that are clear and well structured. We reward good structure
+for ANY site, with local-business facts (phone, price, address) as a bonus rather
+than a requirement.
+
+  - Clear, descriptive headings ............ up to 6
+  - Scannable structure (lists/paragraphs) . up to 5
+  - Questions / FAQ (direct answers) ........ up to 3
+  - Concrete facts (phone, ₹, address, email) up to 6  (bonus)
 """
 from __future__ import annotations
 
@@ -12,10 +18,10 @@ from bs4 import BeautifulSoup
 from .base import CheckResult
 
 MAX = 20.0
-
-PHONE_RE = re.compile(r"(?:\+?91[\-\s]?)?[6-9]\d{9}\b")
-PRICE_RE = re.compile(r"(?:₹|\bRs\.?\b|\bINR\b)\s?\d", re.IGNORECASE)
-QWORDS = ("how", "what", "why", "when", "where", "who", "which", "can", "do", "is", "are")
+PHONE_RE = re.compile(r"(?:\+?\d{1,3}[\-\s]?)?(?:\(?\d{2,4}\)?[\-\s]?)?\d{3}[\-\s]?\d{4}\b")
+PRICE_RE = re.compile(r"(?:₹|\bRs\.?\b|\bINR\b|\$|€|£)\s?\d", re.IGNORECASE)
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+QWORDS = ("how", "what", "why", "when", "where", "who", "which", "can", "do", "is", "are", "should")
 
 
 def run(data) -> CheckResult:
@@ -25,63 +31,61 @@ def run(data) -> CheckResult:
         t.decompose()
     text = soup.get_text(" ", strip=True)
     low = text.lower()
-
     findings = []
     earned = 0.0
 
-    # Question-style headings (6)
+    # 1. Clear, descriptive headings (6)
     headings = [h.get_text(" ", strip=True) for h in soup.find_all(["h1", "h2", "h3"])]
-    q_headings = [
-        h for h in headings
-        if "?" in h or h.lower().split(" ")[0] in QWORDS
-    ]
-    if q_headings:
+    headings = [h for h in headings if len(h) >= 3]
+    if len(headings) >= 2:
         earned += 6
-        findings.append(f"{len(q_headings)} question-style heading(s) found.")
+        findings.append(f"{len(headings)} clear headings structure the page.")
+    elif headings:
+        earned += 3
+        findings.append("Only one heading - add more to structure the page.")
     else:
-        findings.append("No question-style headings (e.g. 'How do I...?').")
+        findings.append("No headings found - AI can't see the page's structure.")
 
-    # FAQ presence (4)
-    if "faq" in low or "frequently asked" in low:
-        earned += 4
-        findings.append("FAQ section detected.")
+    # 2. Scannable structure: lists or real paragraphs (5)
+    lists = soup.find_all(["ul", "ol"])
+    paras = [p for p in soup.find_all("p") if len(p.get_text(strip=True)) > 40]
+    if lists or len(paras) >= 5:
+        earned += 5
+        findings.append("Content is scannable (lists / clear paragraphs).")
     else:
-        findings.append("No FAQ section found.")
+        findings.append("Little scannable structure (few lists or paragraphs).")
 
-    # Phone (4)
+    # 3. Questions / FAQ (3)
+    q_headings = [h for h in headings if "?" in h or h.lower().split(" ")[0] in QWORDS]
+    if q_headings or "faq" in low or "frequently asked" in low:
+        earned += 3
+        findings.append("Has question-style headings or an FAQ (great for AI answers).")
+    else:
+        findings.append("No FAQ or question-style headings - add some direct Q&A.")
+
+    # 4. Concrete facts - bonus (6)
+    facts = []
+    fact_pts = 0.0
     if PHONE_RE.search(text):
-        earned += 4
-        findings.append("A phone number is present on the page.")
-    else:
-        findings.append("No phone number found in the page text.")
-
-    # Price in rupees (3)
+        fact_pts += 2; facts.append("phone")
     if PRICE_RE.search(text):
-        earned += 3
-        findings.append("Clear pricing (₹) present.")
-    else:
-        findings.append("No clear ₹ price on the page.")
-
-    # Address / city hint (3)
+        fact_pts += 1.5; facts.append("price")
     if re.search(r"\b(address|pin\s?code|\d{6})\b", low):
-        earned += 3
-        findings.append("An address / PIN code is present.")
+        fact_pts += 1.5; facts.append("address")
+    if EMAIL_RE.search(text):
+        fact_pts += 1; facts.append("email")
+    earned += min(fact_pts, 6)
+    if facts:
+        findings.append("Concrete facts present: " + ", ".join(facts) + ".")
     else:
-        findings.append("No clear address or city on the page.")
+        findings.append("No concrete facts (phone, price, address) - add them if relevant.")
 
     earned = min(earned, MAX)
-    fix = ""
-    if earned < MAX:
-        fix = (
-            "Add question-style headings with short, direct answers, an FAQ, and clear facts "
-            "(phone, ₹ price, city/address) in plain text."
-        )
-
+    fix = "" if earned >= MAX else (
+        "Use clear descriptive headings, short direct answers and lists; add an FAQ "
+        "and concrete facts (phone, price, city) where they fit your business."
+    )
     return CheckResult(
-        key="answer_friendly",
-        name="Answer-friendly content",
-        points=round(earned, 1),
-        max_points=MAX,
-        findings=findings,
-        fix=fix,
+        key="answer_friendly", name="Answer-friendly content",
+        points=round(earned, 1), max_points=MAX, findings=findings, fix=fix,
     )

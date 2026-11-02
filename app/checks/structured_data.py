@@ -1,7 +1,12 @@
 """Bucket 3 - Structured data (20 points).
 
-JSON-LD schema tells AI exactly what the business is, instead of guessing.
-We reward the schema types the plan lists.
+JSON-LD schema tells AI exactly what a page is, instead of guessing. We credit
+ANY valid, recognised schema (news, article, product, local business, etc.) -
+not just one site type.
+
+Scoring:
+  - valid JSON-LD present ................. 10 (base)
+  - each distinct recognised @type ....... +4 (capped at 20 total)
 """
 from __future__ import annotations
 
@@ -12,17 +17,19 @@ from bs4 import BeautifulSoup
 from .base import CheckResult
 
 MAX = 20.0
+BASE = 10.0
+PER_TYPE = 4.0
 
-# type -> points (capped at MAX overall)
-VALUABLE = {
-    "Organization": 8,
-    "LocalBusiness": 8,
-    "FAQPage": 5,
-    "Product": 5,
-    "Article": 4,
-    "BlogPosting": 4,
-    "WebSite": 3,
-    "BreadcrumbList": 2,
+# A broad set of legitimate schema.org types worth crediting.
+RECOGNISED = {
+    "Organization", "LocalBusiness", "Corporation", "NewsMediaOrganization",
+    "ProfessionalService", "Store", "Restaurant",
+    "WebSite", "WebPage", "SearchAction", "BreadcrumbList",
+    "FAQPage", "QAPage", "HowTo", "Question",
+    "Product", "Offer", "Service",
+    "Article", "NewsArticle", "BlogPosting", "Blog",
+    "VideoObject", "ImageObject", "Recipe", "Event", "Course",
+    "Person", "Review", "AggregateRating", "PostalAddress",
 }
 
 
@@ -55,33 +62,26 @@ def run(data) -> CheckResult:
         except (json.JSONDecodeError, TypeError):
             continue
 
-    earned = 0.0
-    for t, pts in VALUABLE.items():
-        if t in found:
-            earned += pts
-    earned = min(earned, MAX)
-
+    recognised = found & RECOGNISED
     findings = []
-    if not blocks:
+    if not parsed_ok:
+        earned = 0.0
         findings.append("No JSON-LD structured data found.")
     else:
+        earned = min(BASE + PER_TYPE * len(recognised), MAX)
         findings.append(f"Found {parsed_ok} JSON-LD block(s).")
         if found:
             findings.append("Schema types present: " + ", ".join(sorted(found)) + ".")
 
     fix = ""
     if earned < MAX:
-        missing = [t for t in ("Organization", "LocalBusiness", "FAQPage", "Product") if t not in found]
-        fix = (
-            "Add JSON-LD schema so AI knows your business name, city and services. "
-            "Start with: " + ", ".join(missing[:3]) + "."
-        )
+        if not parsed_ok:
+            fix = ("Add JSON-LD schema so AI knows what your pages are. "
+                   "For a business start with Organization or LocalBusiness and FAQPage.")
+        else:
+            fix = "Add more schema (e.g. FAQPage, Product/Service, or Article) to describe your pages fully."
 
     return CheckResult(
-        key="structured_data",
-        name="Structured data",
-        points=round(earned, 1),
-        max_points=MAX,
-        findings=findings,
-        fix=fix,
+        key="structured_data", name="Structured data",
+        points=round(earned, 1), max_points=MAX, findings=findings, fix=fix,
     )
