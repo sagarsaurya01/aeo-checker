@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your AEO score</title>
+<style>
+  :root { --ink:#1a1a2e; --muted:#5b5b7a; --bg:#f6f7fb; --card:#fff; --accent:#4f46e5; --line:#e6e6f0;
+          --good:#16a34a; --mid:#d97706; --bad:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:720px; margin:0 auto; padding:40px 16px; }
+  a.back { color:var(--accent); text-decoration:none; font-weight:600; }
+  .score-card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; text-align:center; margin:18px 0; }
+  .score { font-size:3.6rem; font-weight:800; line-height:1; }
+  .grade { font-size:1.1rem; font-weight:700; margin-top:6px; }
+  .url { color:var(--muted); word-break:break-all; margin-top:8px; font-size:.9rem; }
+  .bucket { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:12px 0; }
+  .bhead { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .bname { font-weight:700; }
+  .bpts { font-weight:800; white-space:nowrap; }
+  .bar { height:8px; background:var(--line); border-radius:6px; margin:10px 0; overflow:hidden; }
+  .bar > span { display:block; height:100%; border-radius:6px; }
+  ul { margin:8px 0 0; padding-left:18px; color:var(--muted); font-size:.92rem; }
+  .fix { margin-top:10px; background:#f3f1ff; border-left:3px solid var(--accent); padding:8px 12px; border-radius:6px; font-size:.92rem; }
+  .err { background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; color:var(--bad); }
+  .cta { background:var(--ink); color:#fff; border-radius:16px; padding:22px; margin-top:20px; text-align:center; }
+  .cta b { font-size:1.1rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/">&larr; Check another site</a>
+
+    {% if not audit.ok %}
+      <div class="err" style="margin-top:18px;">
+        <b>We couldn't read that site.</b><br>{{ audit.error }}
+      </div>
+    {% else %}
+      {% set color = 'var(--good)' if audit.score >= 60 else ('var(--mid)' if audit.score >= 40 else 'var(--bad)') %}
+      <div class="score-card">
+        {% if name %}<div style="color:var(--muted);">Hi {{ name }}, here's your result</div>{% endif %}
+        <div class="score" style="color:{{ color }};">{{ audit.score }}<span style="font-size:1.4rem;color:var(--muted);">/100</span></div>
+        <div class="grade" style="color:{{ color }};">{{ audit.grade }}</div>
+        <div class="url">{{ audit.url }}</div>
+      </div>
+
+      <h3 style="margin:22px 0 6px;">Your results (biggest problems first)</h3>
+      {% for r in audit.results %}
+        {% set c = 'var(--good)' if r.pct >= 70 else ('var(--mid)' if r.pct >= 40 else 'var(--bad)') %}
+        <div class="bucket">
+          <div class="bhead">
+            <span class="bname">{{ r.name }}</span>
+            <span class="bpts" style="color:{{ c }};">{{ r.points }} / {{ r.max_points|int }}</span>
+          </div>
+          <div class="bar"><span style="width:{{ r.pct }}%; background:{{ c }};"></span></div>
+          <ul>{% for f in r.findings %}<li>{{ f }}</li>{% endfor %}</ul>
+          {% if r.fix %}<div class="fix"><b>Fix:</b> {{ r.fix }}</div>{% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="cta">
+        <b>Want these fixed?</b><br>
+        We make your site AI-ready - usually ₹15,000 to ₹50,000 depending on size.<br>
+        <span style="color:#cfcfe6;font-size:.9rem;">We'll be in touch. This score measures readiness, not a guarantee of appearing in AI answers.</span>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

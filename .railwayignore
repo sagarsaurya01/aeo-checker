@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+server.log
+leads.csv
+run_test.py

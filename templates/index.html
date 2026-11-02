@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AEO Readiness Checker</title>
+<style>
+  :root { --ink:#1a1a2e; --muted:#5b5b7a; --bg:#f6f7fb; --card:#fff; --accent:#4f46e5; --line:#e6e6f0; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:640px; margin:0 auto; padding:48px 16px; }
+  h1 { font-size:1.9rem; margin:0 0 8px; }
+  p.lead { color:var(--muted); margin:0 0 28px; font-size:1.05rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:24px; }
+  label { display:block; font-weight:600; margin:14px 0 6px; font-size:.95rem; }
+  input { width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px; font-size:1rem; }
+  button { margin-top:22px; width:100%; padding:14px; background:var(--accent); color:#fff; border:0; border-radius:10px; font-size:1.05rem; font-weight:700; cursor:pointer; }
+  .row { display:flex; gap:12px; }
+  .row > div { flex:1; }
+  .note { color:var(--muted); font-size:.85rem; margin-top:16px; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Is your website ready for AI?</h1>
+    <p class="lead">Get a free score out of 100 on how well ChatGPT, Gemini, Perplexity and Google AI can read your site.</p>
+    <div class="card">
+      <form method="post" action="/audit">
+        <label for="url">Your website address</label>
+        <input id="url" name="url" placeholder="example.com" required>
+        <div class="row">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name">
+          </div>
+          <div>
+            <label for="phone">WhatsApp</label>
+            <input id="phone" name="phone" placeholder="Phone">
+          </div>
+        </div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@business.com">
+        <button type="submit">Check my site - free</button>
+      </form>
+      <p class="note">Takes about 15 seconds. No login needed.</p>
+    </div>
+  </div>
+</body>
+</html>
